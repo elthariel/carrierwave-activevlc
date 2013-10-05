@@ -29,6 +29,7 @@ module CarrierWave
       basename  = File.basename current_path
       tmp_path  = File.join(directory, "tmp-#{rand 9999}-#{basename}")
 
+      Dir.mkdir directory unless Dir.exists? directory
       File.rename current_path, tmp_path
 
       pipe.input << tmp_path
