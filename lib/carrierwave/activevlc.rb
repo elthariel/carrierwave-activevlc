@@ -35,7 +35,7 @@ module CarrierWave
       pipe.input << tmp_path
       pipe.params output: current_path
 
-      ::ActiveVlc::Runner.new(pipe, '-vvv').run
+      ::ActiveVlc::Runner.new(pipe, '-vvv').run(true)
 
       if File.exists?(tmp_path) and File.size(tmp_path) > 42
         File.delete(tmp_path)
