@@ -37,6 +37,10 @@ module CarrierWave
 
       ::ActiveVlc::Runner.new(pipe, '-vvv').run(true)
 
+      # Transcoding can be long, so we might hit database timeout ?
+      # We here try to restablish the connection
+      ActiveRecord::Base.establish_connection
+
       if File.exists?(tmp_path) and File.size(tmp_path) > 42
         File.delete(tmp_path)
       else
