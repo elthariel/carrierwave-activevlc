@@ -13,8 +13,7 @@ module CarrierWave
       #
       def encode_video(&block)
         return unless block_given?
-        pipeline = ::ActiveVlc::Pipeline.new &block
-        process pipeline: [pipeline]
+        process pipeline: ::ActiveVlc::Pipeline.new(&block)
       end
     end
 
@@ -27,24 +26,21 @@ module CarrierWave
       # rely on it to detect the type of the file.
       directory = File.dirname current_path
       basename  = File.basename current_path
-      tmp_path  = File.join(directory, "tmp-#{rand 9999}-#{basename}")
+      my_tmp_path  = File.join(directory, "tmp-#{rand 9999}-#{basename}")
 
       Dir.mkdir directory unless Dir.exists? directory
-      File.rename current_path, tmp_path
+      File.rename current_path, my_tmp_path
 
-      pipe.input << tmp_path
+      pipe.input.clear! # Reset input of previous run
+      pipe.input << my_tmp_path
       pipe.params output: current_path
 
-      ::ActiveVlc::Runner.new(pipe, '-vvv').run(true)
+      ::ActiveVlc::Runner.new(pipe, '-vvv').run(type: :exec)
 
-      # Transcoding can be long, so we might hit database timeout ?
-      # We here try to restablish the connection
-      ::ActiveRecord::Base.establish_connection
-
-      if File.exists?(tmp_path) and File.size(tmp_path) > 42
-        File.delete(tmp_path)
+      if File.exists?(my_tmp_path) and File.size(my_tmp_path) > 42
+        File.delete(my_tmp_path)
       else
-        File.rename(tmp_path, current_path)
+        File.rename(my_tmp_path, current_path)
       end
     end
   end
