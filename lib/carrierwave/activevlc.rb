@@ -40,7 +40,7 @@ module CarrierWave
       if File.exists?(my_tmp_path) and File.size(my_tmp_path) > 42
         File.delete(my_tmp_path)
         File.rename(current_path, my_tmp_path)
-        avconv_path = ENV['AVCONV_PATH'] ? ENV['AVCONV'] : 'avconv'
+        avconv_path = ENV['AVCONV'] ? ENV['AVCONV'] : 'avconv'
         `#{avconv_path} -i #{my_tmp_path} -acodec copy -vcodec copy #{current_path}`
         File.delete(my_tmp_path)
       else
